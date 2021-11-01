@@ -21,18 +21,20 @@
 
 """
 
-import requests as req_api  # importing requests module
-from tabulate import tabulate as tab    # importing tabulate to frame a result grid
+# importing requests module
+import requests as reqApi
+# importing tabulate to frame a result grid
+from tabulate import tabulate as tab
 
 
-base_url = "https://api.github.com/"
+BASE_URI = "https://api.github.com/"
 
 
 #  Function which pull repository information by accepting username.
 def get_repositories_info_tabulated(username: str):
     try:
-        url = base_url + f"users/{username}/repos"
-        response = req_api.get(url)
+        url = BASE_URI + f"users/{username}/repos"
+        response = reqApi.get(url)
         if not response.ok:
             print(f"\nApi call didn't worked. Returned {response}")
             exit(-1)
@@ -57,6 +59,10 @@ def get_repositories_info_tabulated(username: str):
         exit(-1)
 
 
+def github_userinfo():
+    USERNAME = input("What's the username in github? ")
+    return get_repositories_info_tabulated(USERNAME)
+
 # Execute the below code block if this file run as a primary file.
 if __name__ == '__main__':
-    print(get_repositories_info_tabulated("microsoft"))
+    print(github_userinfo())
