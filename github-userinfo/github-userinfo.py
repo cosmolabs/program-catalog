@@ -1,4 +1,5 @@
 #!/usr/bin/python
+
 """
 
 +----------------+---------------------------------------------------------------+
@@ -21,47 +22,80 @@
 
 """
 
+
+from typing import Optional, Any
+
 # importing requests module
-import requests as reqApi
+import requests as request_api
 # importing tabulate to frame a result grid
-from tabulate import tabulate as tab
+from requests import Response
+from tabulate import tabulate
 
 
-BASE_URI = "https://api.github.com/"
+def get_userdata_from_github(username: str):
+    """
+    A function that retrieves and returns the data from github for a given username.
+    :rtype: object
+    :param username: a string, any username from github.
+    :return: an array of dictionaries
+    """
+    github_api_base = "https://api.github.com/"
+    user_repos_link = github_api_base + f"users/{username}/repos"
+    github_api_response: Response = request_api.get(user_repos_link)
+    if not github_api_response.ok:
+        print(f"\nApi call didn't worked. Returned {github_api_response}")
+        exit(-1)
+    else:
+        # .json methods returns an array of dictionaries in json format.
+        # you can use keys to retrieve values.
+        user_repos: object = github_api_response.json()
+        return user_repos
+    
+
+def frame_required_data_from_a_repo(user_repo) -> object:
+    """
+    A function that accepts a user repository and returns the required labels and it's detail.
+    :param user_repo:
+    :return: list of list (contains a label and it's corresponding detail.)
+    """
+    required_label_dict: dict = {'Repository': "name", 'Description': "description", 'SSH URL': "ssh_url",
+                                 'HTML URL': "html_url", 'Create Date': "created_at", 'Watcher Count': "watchers_count",
+                                 'Update Date': "updated_at"}
+    labels_list = []
+    details_list: list[Optional[Any]] = []
+    # .keys returns all the keys that are available in the dictionary.
+    for a_label_key in required_label_dict.keys():
+        labels_list.append(a_label_key)
+        label_value: str = user_repo.get(required_label_dict.get(a_label_key))
+        details_list.append(str(label_value).ljust(65))
+    return list(zip(labels_list, details_list))
 
 
-#  Function which pull repository information by accepting username.
-def get_repositories_info_tabulated(username: str):
+def tabulate_repo_data(repo):
+    """
+    A function that returns a repo as a tabulated data.
+    :param repo: framed github repository.
+    :return:
+    """
+    return tabulate(repo, tablefmt="fancy_grid")
+
+
+def github_userinfo():
+    username = input("What's the username in github? ")
     try:
-        url = BASE_URI + f"users/{username}/repos"
-        response = reqApi.get(url)
-        if not response.ok:
-            print(f"\nApi call didn't worked. Returned {response}")
-            exit(-1)
-        else:
-            user_repo_list = response.json()    # returns a list of dictionaries
-            required_list = []            
-            # Framing a list of dictionaries with only the required keys.
-            for a_repo in user_repo_list:
-                # * Python IDE helps in writing the declaration as literal
-                required_details = {"Repository": a_repo.get("name"), "Description": a_repo.get("description"),
-                                    "SSH URL": a_repo.get("ssh_url"), "HTML URL": a_repo.get("html_url"),
-                                    "Create Date": a_repo.get("created_at"),
-                                    "Watchers Count": a_repo.get("watchers_count"),
-                                    "Update Date": a_repo.get("updated_at")}
-                required_list.append(required_details)
-            # * More tabulate details can be found in https://pypi.org/project/tabulate/
-            return tab(required_list, headers="keys", showindex="always", tablefmt="grid")
-    # ToDo: update the generic exception with actual exception that has to be caught during web api calls.
+        github_userdata = get_userdata_from_github(username)
+        repo_info = f"\nGitHub user info for the user {username}: \n"
+        for a_repo in github_userdata:
+            repo_data_in_required_fmt = frame_required_data_from_a_repo(a_repo)
+            repo_data_tabulated = tabulate_repo_data(repo_data_in_required_fmt)
+            repo_info = repo_info + "\n\n" + repo_data_tabulated
+        return repo_info
+    # ToDo: update the generic exception with actual exception.
     except Exception as ex:
         print("\nSome exception occurred during the api call.")
         print(f"\nStack trace: {ex}")
         exit(-1)
 
-
-def github_userinfo():
-    USERNAME = input("What's the username in github? ")
-    return get_repositories_info_tabulated(USERNAME)
 
 # Execute the below code block if this file run as a primary file.
 if __name__ == '__main__':
