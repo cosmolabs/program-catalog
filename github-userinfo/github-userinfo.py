@@ -1,5 +1,14 @@
 #!/usr/bin/python
 
+# imports
+from typing import Optional, Any
+# importing requests module
+import requests as request_api
+# importing tabulate to frame a result grid
+from requests import Response
+from tabulate import tabulate
+from os import path as io
+
 """
 
 +----------------+---------------------------------------------------------------+
@@ -21,15 +30,6 @@
 +----------------+---------------------------------------------------------------+
 
 """
-
-
-from typing import Optional, Any
-
-# importing requests module
-import requests as request_api
-# importing tabulate to frame a result grid
-from requests import Response
-from tabulate import tabulate
 
 
 def get_userdata_from_github(username: str):
@@ -80,16 +80,57 @@ def tabulate_repo_data(repo):
     return tabulate(repo, tablefmt="fancy_grid")
 
 
+def add_contents_to_a_file(contents_to_be_added, file_path):
+    """
+    This function adds contents to a file. It's so smart, that it can identity if
+    the file exists or not before adding and prompts user to create if it doesn't.
+
+    Args:
+        contents_to_be_added (string): The tabulated intro that has to be added to the file.
+        file_path (string): The path to the file including file name to add the intro.
+    """
+    # Verifying whether a file exists or not and if it's valid file or not.
+    if io.exists(file_path) and io.isfile(file_path):
+        # * prepending the contents to the file by reading
+        # * and joining the new content and the old content
+        with open(file_path, "r") as file:
+            existing_file_content = file.readlines()
+            existing_file_content.insert(0, contents_to_be_added)
+        with open(file_path, "w") as intro_file:
+            intro_file_content = "".join(existing_file_content)
+            intro_file.write(intro_file_content)
+        print("\nAdded intro to the file!!")
+    # To check if path entered is a directory.
+    elif io.isdir(file_path):
+        print("\nEntered path is not a valid file. No intro !!")
+    else:
+        create_file = input("\nFile doesn't exists. Do you want to create a new file (Y or N)?: ")
+        if create_file.upper() == "Y":
+            with open(file_path, "w+") as intro_file:
+                intro_file.write(contents_to_be_added)
+            print("\nAdded to the file!!")
+        else:
+            print("\nNothing!!")
+
+
 def github_userinfo():
     username = input("What's the username in github? ")
     try:
         github_userdata = get_userdata_from_github(username)
-        repo_info = f"\nGitHub user info for the user {username}: \n"
+        repo_info = f"Username: {username};\n"
         for a_repo in github_userdata:
             repo_data_in_required_fmt = frame_required_data_from_a_repo(a_repo)
             repo_data_tabulated = tabulate_repo_data(repo_data_in_required_fmt)
             repo_info = repo_info + "\n\n" + repo_data_tabulated
-        return repo_info
+        save_to_file = input("\nDo you want to save the data to a file? (Y or N): ")
+        # Asking user to output into standard output or to a file.
+        if save_to_file.upper() == "Y":
+            file_path = input("\nEnter the path (including the file name): ")
+            add_contents_to_a_file(repo_info, file_path)
+        elif save_to_file.upper() == "N":
+            print(repo_info)
+        else:
+            print('\nSelect Y or N, when asked for. Start over again!!')
     # ToDo: update the generic exception with actual exception.
     except Exception as ex:
         print("\nSome exception occurred during the api call.")
@@ -99,4 +140,4 @@ def github_userinfo():
 
 # Execute the below code block if this file run as a primary file.
 if __name__ == '__main__':
-    print(github_userinfo())
+    github_userinfo()
