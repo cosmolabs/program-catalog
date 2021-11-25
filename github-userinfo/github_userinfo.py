@@ -2,12 +2,11 @@
 
 # imports
 from typing import Optional, Any
-# importing requests module
-import requests as request_api
 # importing tabulate to frame a result grid
 from requests import Response
 from tabulate import tabulate
 from os import path as io
+from lib.github_api import *
 
 """
 
@@ -26,7 +25,7 @@ from os import path as io
 +----------------+---------------------------------------------------------------+
 | Instructions:  | Will update later.                                            |
 +----------------+---------------------------------------------------------------+
-| Date Updated:  | October 27, 2021                                              |
+| Date Updated:  | Nov 21, 2021                                                  |
 +----------------+---------------------------------------------------------------+
 
 """
@@ -116,21 +115,22 @@ def add_contents_to_a_file(contents_to_be_added, file_path):
 def github_userinfo():
     username = input("What's the username in github? ")
     try:
-        github_userdata = get_userdata_from_github(username)
-        repo_info = f"Username: {username};\n"
-        for a_repo in github_userdata:
-            repo_data_in_required_fmt = frame_required_data_from_a_repo(a_repo)
-            repo_data_tabulated = tabulate_repo_data(repo_data_in_required_fmt)
-            repo_info = repo_info + "\n\n" + repo_data_tabulated
-        save_to_file = input("\nDo you want to save the data to a file? (Y or N): ")
-        # Asking user to output into standard output or to a file.
-        if save_to_file.upper() == "Y":
-            file_path = input("\nEnter the path (including the file name): ")
-            add_contents_to_a_file(repo_info, file_path)
-        elif save_to_file.upper() == "N":
-            print(repo_info)
-        else:
-            print('\nSelect Y or N, when asked for. Start over again!!')
+        github_userdata = user_info(username)
+        print(github_userdata)
+        # repo_info = f"Username: {username};\n"
+        # for a_repo in github_userdata:
+        #     repo_data_in_required_fmt = frame_required_data_from_a_repo(a_repo)
+        #     repo_data_tabulated = tabulate_repo_data(repo_data_in_required_fmt)
+        #     repo_info = repo_info + "\n\n" + repo_data_tabulated
+        # save_to_file = input("\nDo you want to save the data to a file? (Y or N): ")
+        # # Asking user to output into standard output or to a file.
+        # if save_to_file.upper() == "Y":
+        #     file_path = input("\nEnter the path (including the file name): ")
+        #     add_contents_to_a_file(repo_info, file_path)
+        # elif save_to_file.upper() == "N":
+        #     print(repo_info)
+        # else:
+        #     print('\nSelect Y or N, when asked for. Start over again!!')
     # ToDo: update the generic exception with actual exception.
     except Exception as ex:
         print("\nSome exception occurred during the api call.")
