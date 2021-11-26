@@ -40,11 +40,11 @@ def user_info(username: str):
         user_info_uri = GITHUB_API_BASE + f"users/{username}"
         api_response = execute_request_api(user_info_uri)
         required_labels_dict: dict = {'Name': "name", 'Username': "login", 'Avatar URL': "avatar_url", 
-                                        'URL': "html_url", 'Create Date': "created_at", 
-                                        'About': "bio", 'Update Date': "updated_at", 
-                                        'Follwers': "followers_url", 'Follwing': "following_url", 
-                                        'Subscriptions': "subscriptions_url", 'Repositories': "repos_url", 
-                                        'Email': "email", 'Followers Count': 'followers'}
+                                        'GitHub URL': "html_url", 'Create Date': "created_at", 
+                                        'About': "bio", 'Email': "email", 'Update Date': "updated_at", 
+                                        'Follwers': "followers_url", 'Followers Count': 'followers',
+                                        'Follwing': "following_url", 'Subscriptions': "subscriptions_url", 
+                                        'Repositories': "repos_url"}
         list_of_required_details = get_list_of_required_details_from_response(required_labels_dict, 
                                                                                 api_response)
         return list_of_required_details    

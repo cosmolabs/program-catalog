@@ -70,13 +70,8 @@ def frame_required_data_from_a_repo(user_repo) -> object:
     return list(zip(labels_list, details_list))
 
 
-def tabulate_repo_data(repo):
-    """
-    A function that returns a repo as a tabulated data.
-    :param repo: framed github repository.
-    :return:
-    """
-    return tabulate(repo, tablefmt="fancy_grid")
+def tabulate_listed_data(listed_data: list):
+    return tabulate(listed_data, tablefmt="fancy_grid")
 
 
 def add_contents_to_a_file(contents_to_be_added, file_path):
@@ -112,12 +107,11 @@ def add_contents_to_a_file(contents_to_be_added, file_path):
             print("\nNothing!!")
 
 
-def github_userinfo():
+def github_userinfo_del():
     username = input("What's the username in github? ")
     try:
-        github_userdata = user_info(username)
-        print(github_userdata)
-        # repo_info = f"Username: {username};\n"
+        user_details = user_info(username)        
+        user_name = f"Username: {username};\n"
         # for a_repo in github_userdata:
         #     repo_data_in_required_fmt = frame_required_data_from_a_repo(a_repo)
         #     repo_data_tabulated = tabulate_repo_data(repo_data_in_required_fmt)
@@ -138,6 +132,28 @@ def github_userinfo():
         exit(-1)
 
 
+def github_userinfo(username: str):    
+    try:
+        user_data = user_info(username)
+        return tabulate_listed_data(user_data)       
+    # ToDo: update the generic exception with actual exception.
+    except Exception as ex:
+        print("\nSome exception occurred during the api call.")
+        print(f"\nStack trace: {ex}")
+        exit(-1)
+
+
 # Execute the below code block if this file run as a primary file.
 if __name__ == '__main__':
-    github_userinfo()
+    print("\nMake github user search simpler!!\n")
+    user_name = input("What's the username on github? ")
+    github_entity = input("""\nSelect an entity you want to know about the user:
+                            1)  User Info
+                            \n""")
+    try:
+        if int(github_entity) == 1:
+            print(github_userinfo(user_name))
+        else:
+            print("\nNone selected!!")
+    except:
+        raise ValueError("Input should be a number!!")
