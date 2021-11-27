@@ -1,4 +1,3 @@
 gui-venv/
 .vscode/
 *.pyc
-__pycache__/

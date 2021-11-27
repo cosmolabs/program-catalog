@@ -1,6 +1,7 @@
 # importing requests module
 import requests as request_api
 from requests import Response
+from .helper import add_line_breaks
 
 GITHUB_API_BASE = "https://api.github.com/"
 
@@ -31,14 +32,8 @@ def get_list_of_required_details_from_response(labels_dict: dict, api_response: 
     for a_label_key in labels_dict.keys():
         labels_list.append(a_label_key)
         label_value: str = api_response.get(labels_dict.get(a_label_key))
-        if type(label_value) is str :
-            label_value_length = len(label_value)
-            line_break_chars = 80
-            a_new_line_char_at = line_break_chars
-            while a_new_line_char_at < label_value_length:
-                label_value = label_value[:a_new_line_char_at].strip() + "-\n-" + label_value[a_new_line_char_at:].strip()
-                a_new_line_char_at = a_new_line_char_at + line_break_chars
-        details_list.append(str(label_value).ljust(line_break_chars))
+        label_value = add_line_breaks(label_value, 80)
+        details_list.append(str(label_value).ljust(80))
     return list(zip(labels_list, details_list))
 
 
