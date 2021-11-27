@@ -148,12 +148,12 @@ if __name__ == '__main__':
     print("\nMake github user search simpler!!\n")
     user_name = input("What's the username on github? ")
     github_entity = input("""\nSelect an entity you want to know about the user:
-                            1)  User Info
-                            \n""")
+1)  User Info
+    \n""")
     try:
         if int(github_entity) == 1:
             print(github_userinfo(user_name))
         else:
             print("\nNone selected!!")
     except:
-        raise ValueError("Input should be a number!!")
+        print("Input should be a number!!")
