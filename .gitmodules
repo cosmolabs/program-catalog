@@ -1,0 +1,3 @@
+[submodule "compare/python_modules"]
+	path = compare/python_modules
+	url = git@github.com:cosmolabs/python_modules
