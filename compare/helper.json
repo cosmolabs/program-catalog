@@ -1,0 +1,17 @@
+{
+    "homepath":"/home/ganesh/",
+    "gitpath":"/home/ganesh/gitrepos/configfiles/",
+    "excluded_dirs": [
+        "awesome",
+        ".git",
+        ".vscode-oss",
+        ".fonts"
+    ],
+    "emaildetails":[
+        {
+            "user_name": "rigel",
+            "user_id":"",
+            "user_passwd":""
+        }
+    ]
+}
