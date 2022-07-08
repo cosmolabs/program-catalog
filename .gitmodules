@@ -1,0 +1,3 @@
+[submodule "youtube-downloader/python_modules"]
+	path = youtube-downloader/python_modules
+	url = git@github.com:cosmolabs/python_modules.git
