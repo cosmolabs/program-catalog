@@ -3,7 +3,7 @@
 import python_modules
 
 try:
-    from pytube import YouTube
+    from pytube import YouTube, Playlist
     from python_modules.file_ops import write_file_data, get_diff_btwn_two_files, read_file_data
 except ModuleNotFoundError:
     raise ModuleNotFoundError("Module pytube is not installed yet ....") from None
@@ -15,12 +15,13 @@ def check_if_video_already_exists(url_file_path: str, url: str):
        return True;
     return False;
 
+
 def download_audio_video(url: str):
     """
     Downlaods the video or audio of a given url.
     """
 
-    video = YouTube(video_url)
+    video = YouTube(url)
     print('\nTitle of the video - ', video.title);
 
     print("\nEnter A for only Audio, V for only video, AV for both Audio and Video.")
@@ -68,24 +69,46 @@ def download_audio_video(url: str):
     selected_stream.download()
     print("\nDownload complete !!!")
 
-    urlString = "- "+video_url + "|"
+    url_string = "- " + url + "|"
+    url_save_path = input("Enter the full path of the file where you store these URL's: \n")
+    write_file_data(url_save_path, url_string)
 
-    write_file_data("/home/ganesh/Documents/YTVD_URLS", urlString)
 
-if __name__ == "__main__":
-    print("\nWelcome to YTVd!!!\n");
-    print("Enter the url of the video you want to download.");
-    video_url = input("Video URL: ");
-    video_exists = check_if_video_already_exists("/home/ganesh/Documents/YTVD_URLS", video_url)
+def download_playlist(url: str):
+    playlist_data = Playlist(url)
+    print(f"Playlist - {playlist_data.title}")
+    for video_url in playlist_data.video_urls:
+        download_video(video_url);
+
+def download_video(url: str):
+
+    url_retrive_path = input("Enter the full path of the file where you store these URL's: \n")
+
+    video_exists = check_if_video_already_exists(url_retrive_path, url)
     continue_download = "N";
     if video_exists is True:
         print("\nThis video already exists, you want to continue downloading?")
         continue_download = input("\nY or N: ")
         if continue_download == "Y":
-            download_audio_video(video_url)
+            download_audio_video(url)
         else:
             print("\nNot downloading!!!")
     else:
-        download_audio_video(video_url)
+        download_audio_video(url)
+
+
+
+def youtube_downloader():
+    print("\nWelcome to YTVd!!!\n");
+    print("Enter the url of the video you want to download.");
+    video_url = input("Video URL: ");
+    if "list" in video_url:
+        download_playlist(video_url);
+    else:
+        download_video(video_url);
 
     print("\nThank you!!!")
+
+
+if __name__ == "__main__":
+    youtube_downloader()
