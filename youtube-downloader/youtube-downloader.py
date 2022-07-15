@@ -1,10 +1,11 @@
 #!/usr/bin/evn pythoni
 
 import python_modules
+import os
 
 try:
     from pytube import YouTube, Playlist
-    from python_modules.file_ops import write_file_data, get_diff_btwn_two_files, read_file_data
+    from python_modules.file_ops import write_file_data, get_diff_btwn_two_files, read_file_data, read_json_file_data, write_json_file_data
 except ModuleNotFoundError:
     raise ModuleNotFoundError("Module pytube is not installed yet ....") from None
 
@@ -17,6 +18,7 @@ def check_if_video_already_exists(url_file_path: str, url: str):
 
 
 def download_audio_video(url: str):
+
     """
     Downlaods the video or audio of a given url.
     """
@@ -56,22 +58,36 @@ def download_audio_video(url: str):
 
     selected_stream = downloadable_streams.get_by_itag(itag_selected)
 
-    print("\nDetails of selected record: ")
-    print("Includes Audio - ", selected_stream.includes_audio_track);
-    print("Includes Video - ", selected_stream.includes_video_track);
-    print("Resolution -", selected_stream.resolution);
+    #print("\nDetails of selected record: ")
+    #print("Includes Audio - ", selected_stream.includes_audio_track);
+    #print("Includes Video - ", selected_stream.includes_video_track);
+    #print("Resolution -", selected_stream.resolution);
     type_of_file = selected_stream.mime_type.split("/")[1];
-    print(f"Type - {type_of_file}");
+    #print(f"Type - {type_of_file}");
     file_size = round(selected_stream.filesize*0.000001, 2);
-    print(f"File Size - {file_size} MB");
+    #print(f"File Size - {file_size} MB");
+
+    metadata = dict()
+    md_video_details = dict()
+    md_video = dict()
+    md_video_details["Title"] = video.title[0:25];
+    md_video_details["URL"] = url;
+    md_video_details["Includes Audo"] = selected_stream.includes_audio_track;
+    md_video_details["Resolution"] = selected_stream.resolution;
+    md_video_details["Includes Video"] = selected_stream.includes_video_track
+    md_video_details["File Size"] = file_size
+    md_video_details["Type"] = type_of_file
+    md_video["Video"] = md_video_details
+#    metadata = read_json_file_data(os.path.dirname(__file__) + "/YTVD_data.json")
+    metadata["Videos"] = list()
+    metadata["Videos"].append(md_video["Video"])
 
     print("\nDownload started !!!")
     selected_stream.download()
     print("\nDownload complete !!!")
 
-    url_string = "- " + url + "|"
-    url_save_path = input("Enter the full path of the file where you store these URL's: \n")
-    write_file_data(url_save_path, url_string)
+    ytvd_metadata = os.path.dirname(__file__) + "/YTVD_metadata.json"
+    write_json_file_data(metadata, ytvd_metadata)
 
 
 def download_playlist(url: str):
@@ -80,11 +96,11 @@ def download_playlist(url: str):
     for video_url in playlist_data.video_urls:
         download_video(video_url);
 
+
 def download_video(url: str):
 
-    url_retrive_path = input("Enter the full path of the file where you store these URL's: \n")
-
-    video_exists = check_if_video_already_exists(url_retrive_path, url)
+    ytvd_data_file = os.path.dirname(__file__) + "/YTVD_data.txt"
+    video_exists = check_if_video_already_exists(ytvd_data_file, url)
     continue_download = "N";
     if video_exists is True:
         print("\nThis video already exists, you want to continue downloading?")
@@ -111,4 +127,5 @@ def youtube_downloader():
 
 
 if __name__ == "__main__":
+    print(f"\nScript: {__file__}\n")
     youtube_downloader()
